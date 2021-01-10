@@ -1,11 +1,19 @@
 const mongoose = require('../bin/mongodb');
 const bcrypt = require('bcrypt');
+const productModel = require('../models/productsModels')
 
 const compraUserSchema = new mongoose.Schema({
-    compras : {
-        type : mongoose.Schema.ObjectId,
-        ref :"products"
-    }
+  
+        product : {
+            type: mongoose.Schema.ObjectId,
+            ref:"products"
+        },
+        price : Number,
+        quantity : Number,
+        total : Number,
+        status : String,
+        ventaId : String
+    
 })
 
 
@@ -35,18 +43,12 @@ const userSchema = new mongoose.Schema({
     compras: [compraUserSchema]
 });
 
-userSchema.pre("save", function(next){
+//Al hacer la venta y el save de user (salesController , 83) se aplicaba el pre ("save") y se modificaba la contraseña
+
+/*userSchema.pre("save", function(next){
     this.password = bcrypt.hashSync(this.password,10);
     next();
-
-})
+});*/
 
 module.exports = mongoose.model("user", userSchema);
 
-
-/*
-▪ Nombre
-▪ Apellido
-▪ Email
-▪ Contraseña
-*/

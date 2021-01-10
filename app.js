@@ -48,7 +48,7 @@ app.use('/admin', userAdminRouter);
 app.use('/sales',salesRouter);
 
 
-function  validateUser(req,res,next){kk
+function  validateUser(req,res,next){
   console.log(req.headers['tok'])
   jwt.verify(req.headers['tok'],req.app.get('userKey'),function (err,decoded){
     if(err){

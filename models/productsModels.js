@@ -1,5 +1,5 @@
 const mongoose = require('../bin/mongodb');
-const categoiesSchema = require('../models/categoriesModels')
+const categoriesSchema = require('../models/categoriesModels')
 
 const productsSchema = new mongoose.Schema({
         name :{
@@ -33,22 +33,12 @@ const productsSchema = new mongoose.Schema({
         category : {
             type: mongoose.Schema.ObjectId,
             ref:"categories"
-        },
+        }   
 });
 
+productsSchema.plugin(mongoose.mongoosePaginate);
 module.exports = mongoose.model("products", productsSchema);
-/*
-"name": ,
-"sku": ,
-"price": ,
-"quantity" : ,
-"image" ,
-"description": ,
-"category": ,
 
-//"_id": "5f848cd01132a8021886e80c",
-
-*/
 /*Denominación
 
 

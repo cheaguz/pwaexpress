@@ -3,7 +3,8 @@ const categoriesModels = require('../models/categoriesModels');
 module.exports = {
     create : async function ( req,res,next){
         const category = new categoriesModels({
-            name : req.body.name  
+            name : req.body.name,
+            image : req.body.image 
             });
         const document = await category.save();
         res.json(category);
@@ -13,8 +14,13 @@ module.exports = {
         res.json(category);
     },
     getById : async function(req,res,next){
+        try{
         const category = await categoriesModels.findById(req.params.id);
         res.json(category);
+    }
+    catch(e){
+        console.log(e)
+    }
     },
        update: async function (req, res, next) {
         console.log(req.params.id, req.body);

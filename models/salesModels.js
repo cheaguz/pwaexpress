@@ -1,38 +1,46 @@
 const mongoose = require('../bin/mongodb');
-const paymentSchema = new mongoose.Schema({
-    pay :{
-        type : String,
-        enum: ["efectivo","mercadopago"]
-    },
-    date : {
-        type : Date,
-        default : Date.now
-    },
-    status: {
-        type : String,
-        enum : ["pendiente","pagado","no_pagado"]
-    },
-   
-});
 
 const salesSchema = new mongoose.Schema({
     user_id :{
          type : mongoose.Schema.ObjectId,
          ref : "user"
     },
+    cantidad :{
+        type : Number
+    },
     product_id :{
          type : mongoose.Schema.ObjectId,
          ref : "products"
     },
-    importe :{
+    priceWeb :{
         type : Number,
 
     },
-     monto : {
+    priceProd : {
+        type : Number,
+    },
+     totalDB : {
         type : Number
      },
-    pago :[paymentSchema]
+     totalWeb : {
+         type : Number
+     },
+    pago : {
+        type : String,
+        enum : ["Efectivo", "Mercado_pago"]  
+    },
+    status : {
+        type : String,
+        enum : ["pendiente","aprobado","rechazado"],
+        default : "pendiente"
+    },
+    date : {
+        type : Date,
+        default : Date.now
+    }
     
 });
+
+salesSchema.plugin(mongoose.mongoosePaginate);
 
 module.exports = mongoose.model("sales", salesSchema);

@@ -1,7 +1,9 @@
 const productModels = require('../models/productsModels');
 
+
 module.exports = {
-    create : async function ( req,res,next){
+    create : async ( req,res,next)=>{
+        try{
         const products = new productModels({
             name : req.body.name,
             sku : req.body.sku,
@@ -13,33 +15,62 @@ module.exports = {
         });
         const document = await products.save();
         res.json(products);
+    }
+    catch(e){
+        console.log(e)
+    }
     },
-    getAll : async function (req,res,next){
-        const productos = await productModels.find({}).populate('category');
-                if(productos.quantity==0){
-                    res.json({message:"PRODUCTO FUERA DE STOCK"});
-                }else{
-                    res.json(productos);
+    getAll : async (req,res,next)=>{
+        let queryFind = {};
+        if(req.query.buscar){
+            queryFind = {name:{$regex:".*"+req.query.buscar+".*",$options:"i"}}
+            console.log(queryFind)
+        }
+        try {
+        const productos = await productModels.paginate(queryFind,{
+            populate:"category",
+            page : req.query.page || 1}
+            );
+                 res.json(productos); 
                 }
+                catch(e){
+                    console.log(e)
+                }  
     },
-    getById : async function(req,res,next){
-        const product = await productModels.findById(req.params.id);
-        if(product.quantity==0){
+    getById : async (req,res,next)=>{
+        const product = await productModels.findById(req.params.id).populate("category");
+            res.json(product);
+        
+       
+    },
+
+
+    getByCategory : async function(req,res,next){
+        const product = await productModels.find({category:req.params.cat}).populate("category");
+       if(product.quantity==0){
             res.json({message:"PRODUCTO FUERA DE STOCK"})
         }else{
             res.json(product);
         }
+        res.json(product)
        
     },
+
        update: async function (req, res, next) {
         console.log(req.params.id, req.body);
-        const productos = await productsModels.update({_id: req.params.id }, req.body , {multi : false});
+        const productos = await productModels.update({_id: req.params.id }, req.body , {multi : false});
         res.json(productos);
     },
     delete: async function (req, res, next) {
         console.log(req.params.id);
-        const eliminar = await productsModels.deleteOne({_id: req.params.id });
-        res.json(eliminar);
+        try{
+            const eliminar = await productModels.deleteOne({_id: req.params.id });
+            res.json(eliminar);
+        }
+        catch(e){
+            console.log(e)
+        }
+       
     }
 
     
