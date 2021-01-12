@@ -2,6 +2,7 @@ const salesModels = require('../models/salesModels');
 const productModels = require('../models/productsModels');
 const app = require('../app');
 const userModels = require('../models/userModels');
+const transporter = require('../bin/email');
 
 module.exports = {
     create : async function ( req,res,next){
@@ -45,7 +46,19 @@ module.exports = {
 
                producto.quantity=producto.quantity - req.body.cantidad
                 doc= await producto.save();  
-                const userUpdate= await userModels.update({_id : id},{$push:{compras:[compra]}} ,{multi : false})
+                const userUpdate= await userModels.update({_id : id},{$push:{compras:[compra]}} ,{multi : false});
+
+                const mail = await transporter.sendMail({
+                    from : "ecommercepwa1@gmail.com",
+                    to : user.email,
+                    subject : "Detalles de tu compra",
+                    text : "Gracias por tu compra! Aqui estan los detalles de tu pedido,Porfavor envia el comprobante de pago a este mail ",
+                    html : "<h1>Gracias por tu compra! Aqui estan los detalles de tu pedido,Porfavor envia el comprobante de pago a este mail</h1>"+
+                    "<p>Producto: "+producto.name+"</p>"+
+                    "<p>Cantidad: "+req.body.cantidad+"</p>"+
+                    "<p>Precio: "+req.body.priceWeb+"</p>"+
+                    "<p>Total: "+req.body.totalWeb+"</p>"
+                });
             }
                 res.json(document);
         }
@@ -65,6 +78,7 @@ module.exports = {
     }catch(e){
         console.log(e)
     };
+
     },
     getById : async function(req,res,next){
         const sale = await salesModels.findById(req.params.id).populate("user_id").populate("product_id");
@@ -76,21 +90,22 @@ module.exports = {
         const idVenta = req.params.id;
         const sale= await salesModels.findById(req.params.id);
         const user = await userModels.findById(sale.user_id);
-        const userCompras = user.compras;
+        const userCompras =  user.compras;
 
-        for(var i = 0; i<userCompras.length;i++){
-            if(userCompras[i].ventaId == idVenta){
-                user.compras[i].status = req.body.status;   
-            }
-        }
-        user.save();
-        const sales = await salesModels.update({_id: req.params.id }, req.body , {multi : false});
-
-        res.json(sales);
+        for(var i = 0; i<=userCompras.length;i++){
+            if(userCompras[i].ventaId == idVenta){ 
+                user.compras[i].status = req.body.status; 
+                user.save();
+                const sales = await salesModels.update({_id: req.params.id }, req.body , {multi : false});
+                res.json({message:"Hecho!"});    
+            }; 
+           
+        };
     }
     catch(e){
         console.log(e)
-    }
+    };
+
     },
 
     delete: async function (req, res, next) {

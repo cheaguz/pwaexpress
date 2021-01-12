@@ -6,12 +6,10 @@ var userControllers = require('../controllers/userControllers');
 /* GET users listing. */
 router.post('/login', userControllers.login); //v 
 router.post('/register',userControllers.register);//v
-router.put('/compras/:id',userControllers.compra);// "compras" : [{"compras": "5f98f324dc0c751474e5590c"}]
+router.post('/generate-password',userControllers.requestNewPassword)
+
+router.put('/:id',userControllers.updatePassword)
+
 router.get('/:id',userControllers.getById);
 
 module.exports = router;
-/*
-POST - /login
-PUT - /user/activate/:hash --- generar token 
-
-*/

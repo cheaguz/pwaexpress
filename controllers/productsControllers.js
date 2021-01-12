@@ -24,8 +24,14 @@ module.exports = {
         let queryFind = {};
         if(req.query.buscar){
             queryFind = {name:{$regex:".*"+req.query.buscar+".*",$options:"i"}}
-            console.log(queryFind)
-        }
+        };
+        if(req.query.min && req.query.max){
+            queryFind = {$and:[
+                {price :{$gt:req.query.min}},
+                {price:{$lt:req.query.max}}
+            ]}
+        };
+        
         try {
         const productos = await productModels.paginate(queryFind,{
             populate:"category",
